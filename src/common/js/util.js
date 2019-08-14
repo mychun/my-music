@@ -20,7 +20,6 @@ export function shuffle(arr) {
 export function debounce(func, delay) {
     let timer
     return function (...args) {
-        console.log(1, timer) //undefined
       if (timer) {
         clearTimeout(timer)
       }

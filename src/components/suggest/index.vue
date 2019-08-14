@@ -117,6 +117,9 @@ export default {
       }
       this.$emit('select', item)
     },
+    refresh(){
+      this.$refs.suggest.refresh()
+    },
     ...mapMutations({
       setSinger: 'SET_SINGER'
     }),

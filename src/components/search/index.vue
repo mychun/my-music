@@ -3,8 +3,8 @@
     <div class="search-box-wrapper">
       <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
-    <div class="shortcut-wrapper" v-show="!query">
-      <div class="shortcut">
+    <div class="shortcut-wrapper" ref="shortcutWrapper" v-show="!query">
+      <scroll class="shortcut" ref="shortcut">
         <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
@@ -14,70 +14,117 @@
               </li>
             </ul>
           </div>
-          <div class="search-history">
+          <div class="search-history" v-if="searchHistory.length">
             <h1 class="title">
               <span class="text">搜索历史</span>
-              <span class="clear">
+              <span class="clear" @click="showConfirm">
                 <i class="icon-clear"></i>
               </span>
             </h1>
+            <search-list :searches="searchHistory" @select="addQuery" @delete="deleteSearchHistory"></search-list>
           </div>
         </div>
-      </div>
+      </scroll>
     </div>
-    <div class="search-result" v-show="query">
-      <suggest :query="query" @select="saveSearch" @listScroll="blurInput"></suggest>
+    <div class="search-result" ref="searchResult" v-show="query">
+      <suggest ref="suggest" :query="query" @select="saveSearch" @listScroll="blurInput"></suggest>
     </div>
     <transition name="slide">
       <router-view></router-view>
     </transition>
+    <confirm text="是否清空所有搜索历史？" confirmBtnText="清空" ref="confirm" @confirm="clearSearch"></confirm>
   </div>
 </template>
 <script>
 import SearchBox from "@/base/search-box";
-import {getHotKey} from '@/api/search'
-import {ERR_OK} from '@/api/config'
-import Suggest from '@/components/suggest'
-import {mapActions} from 'vuex'
+import SearchList from "@/base/search-list";
+import { getHotKey } from "@/api/search";
+import { ERR_OK } from "@/api/config";
+import Suggest from "@/components/suggest";
+import { mapActions, mapGetters } from "vuex";
+import Confirm from "@/base/confirm";
+import Scroll from "@/base/scroll";
+import { playlistMixin } from "@/common/js/mixin";
 export default {
   name: "search",
   components: {
     SearchBox,
-    Suggest
+    Suggest,
+    SearchList,
+    Confirm,
+    Scroll
   },
-  created(){
-      this._getHotKey()
+  mixins: [playlistMixin],
+  created() {
+    this._getHotKey();
   },
-  data(){
-      return {
-          hotKey: [],
-          query: ''
+  data() {
+    return {
+      hotKey: [],
+      query: ""
+    };
+  },
+  computed: {
+    ...mapGetters(["searchHistory"])
+  },
+  watch: {
+    query(newQuery){
+      // 通过监听query来刷新shortcut scroll，要不切换会shortcut显示，scroll失效
+      if(!newQuery){
+        //不能直接写
+        //this.$refs.shortcut.refresh()
+        //因为dom为加载完成，refresh会无效
+        this.$nextTick(()=>{
+            this.$refs.shortcut.refresh()
+        });
       }
+    }
   },
   methods: {
-      addQuery(query){
-          this.$refs.searchBox.setQuery(query)
-      },
-      onQueryChange(query){
-          this.query = query
-      },
-      blurInput(){
-        //上拉滚动时，让输入框失去焦点，关闭手机键盘
-        this.$refs.searchBox.blur()
-      },
-      saveSearch(){
-        this.saveSearchHistory(this.query)
-      },
-      _getHotKey(){
-          getHotKey().then((res) => {
-              if(res.code === ERR_OK){
-                  this.hotKey = res.data.hotkey.slice(0, 10)
-              }
-          })
-      },
-      ...mapActions([
-        'saveSearchHistory'
-      ])
+    handlePlaylist(playlist) {
+      //播放列表playlist有就是小型播放器的高度
+      const bottom = playlist.length > 0 ? "60px" : "";
+
+      this.$refs.shortcutWrapper.style.bottom = bottom;
+      this.$refs.shortcut.refresh();
+
+      this.$refs.searchResult.style.bottom = bottom;
+      this.$refs.suggest.refresh()
+    },
+    addQuery(query) {
+      this.$refs.searchBox.setQuery(query);
+    },
+    onQueryChange(query) {
+      this.query = query;
+    },
+    blurInput() {
+      //上拉滚动时，让输入框失去焦点，关闭手机键盘
+      this.$refs.searchBox.blur();
+    },
+    saveSearch() {
+      this.saveSearchHistory(this.query);
+    },
+    deleteSearchHistory(item) {
+      this.deleteSearchHistory(item);
+    },
+    showConfirm() {
+      this.$refs.confirm.show();
+    },
+    clearSearch() {
+      this.clearSearchHistory();
+    },
+    _getHotKey() {
+      getHotKey().then(res => {
+        if (res.code === ERR_OK) {
+          this.hotKey = res.data.hotkey.slice(0, 10);
+        }
+      });
+    },
+    ...mapActions([
+      "saveSearchHistory",
+      "deleteSearchHistory",
+      "clearSearchHistory"
+    ])
   }
 };
 </script>

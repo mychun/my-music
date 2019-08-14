@@ -19,3 +19,5 @@ export const currentSong = (state) => { //当前播放哪首歌
 export const disc = state => state.disc
 
 export const topList = state => state.topList
+
+export const searchHistory = state => state.searchHistory

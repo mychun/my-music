@@ -94,6 +94,7 @@ export default {
     },
     refresh() {
       //刷新
+      //注意判断dom是未加载完成
       this.scroll && this.scroll.refresh();
     },
     scrollTo(){

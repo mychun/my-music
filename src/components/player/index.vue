@@ -71,6 +71,9 @@
             <div class="icon i-right" :class="disableCls">
               <i @click="next" class="icon-next"></i>
             </div>
+            <div class="icon i-right">
+              <i @click="toggleFavorite(currentSong)" class="icon" :class="getFavoriteIcon(currentSong)"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -92,15 +95,16 @@
           </progress-circle>
         </div>
         <div class="control">
-          <i class="icon-playlist"></i>
+          <i class="icon-playlist" @click.stop="showPlaylist"></i>
         </div>
       </div>
     </transition>
     <audio ref="audio" :src="currentSong.url" @playing="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
+    <playlist ref="playlist"></playlist>
   </div>
 </template>
 <script>
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters, mapMutations, mapActions } from "vuex";
 //创建css3动画插件
 import animations from "create-keyframe-animation";
 //dom操作
@@ -113,6 +117,7 @@ import { shuffle } from '@/common/js/util'
 import { getLyric } from '@/common/js/song'
 import Lyric from 'lyric-parser'
 import Scroll from '@/base/scroll'
+import Playlist from '@/components/playlist'
 
 const transform = prefixStyle("transform")
 const transitionDuration = prefixStyle("transitionDuration")
@@ -122,7 +127,8 @@ export default {
   components: {
     ProgressBar,
     ProgressCircle,
-    Scroll
+    Scroll,
+    Playlist
   },
   data(){
     return {
@@ -146,7 +152,8 @@ export default {
       'currentIndex', 
       'playlist',
       'mode',
-      'sequenceList'
+      'sequenceList',
+      'favoriteList'
     ]),
     playIcon() {
       return this.playing ? "icon-pause" : "icon-play";
@@ -171,6 +178,32 @@ export default {
     }
   },
   methods: {
+    toggleFavorite(item){
+      let index = this.favoriteList.findIndex((song) => {
+        return song.id === item.id
+      })
+      if(index < 0){
+        this.saveFavoriteList(item)
+      }else{
+        this.deleteFavoriteList(item)
+      }
+    },
+    getFavoriteIcon(item){
+      //只有vue的属性有改变，这个方法都会触发
+      //例如：点击toggleFavorite 触发 saveFavoriteList 修改到favoriteList的值
+      //这个方法也会跟着触发
+      let index = this.favoriteList.findIndex((song) => {
+        return song.id === item.id
+      })
+      if(index >= 0){
+        return 'icon-favorite'
+      }else{
+        return 'icon-not-favorite'
+      }
+    },
+    showPlaylist(){
+      this.$refs.playlist.show()
+    },
     back() {
       this.setFullScreen(false);
     },
@@ -183,6 +216,10 @@ export default {
       setCurrentIndex: "SET_CURRENT_INDEX",
       setPlayMode: "SET_PLAY_MODE",
       setPlayList :"SET_PLAYLIST"
+    }),
+    ...mapActions({
+      saveFavoriteList: 'saveFavoriteList',
+      deleteFavoriteList: 'deleteFavoriteList'
     }),
     enter(el, done) {
       const { x, y, scale } = this._getPosAndScale();
@@ -500,7 +537,13 @@ export default {
     }
   },
   watch: {
-    currentSong(newSong) {
+    currentSong(newSong, oldSong) {
+      if (!newSong.id || !newSong.url || newSong.id === oldSong.id) {
+        //清空播放列表!newSong.url !newSong.id 
+        //在删除一首歌会碰到newSong.id === oldSong.id
+        return
+      }
+
       //直接这样会报错
       //Uncaught (in promise) DOMException
       //因为currentSong改变还没有更新到dom，也没到dom的属性
@@ -512,7 +555,7 @@ export default {
 
       this.$nextTick(() => {
         this.$refs.audio.play();
-
+        this.setPlayingState(true)
         this.getLyric()
       });
     },

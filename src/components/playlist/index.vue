@@ -18,6 +18,7 @@
               v-for="(item, index) in sequenceList"
               :key="item.id"
               @click="selectItem(item,index)"
+              :id="item.id"
               ref="listItem"
             >
               <i class="current" :class="getCurrentIcon(item)"></i>
@@ -54,6 +55,7 @@ import { playMode } from "@/common/js/config";
 import { shuffle } from "@/common/js/util";
 import Confirm from '@/base/confirm'
 import AddSong from '@/components/add-song'
+import { types } from 'util';
 
 const modeArr = [
   {
@@ -89,7 +91,7 @@ export default {
     modeText(){
         return modeArr[this.mode].modeText
     },
-    ...mapGetters(["sequenceList", "currentSong", "mode", 'favoriteList', 'playing'])
+    ...mapGetters(["sequenceList", "currentSong", "mode", 'favoriteList', 'playing', 'playlist'])
   },
   methods: {
     addSong(){
@@ -167,9 +169,10 @@ export default {
       }
       return "";
     },
-    selectItem(item, index) {
+    selectItem(item,index) {
+
       if (this.mode === playMode.random) {
-        index = this.playlist.findIndex(song => {
+          index = this.playlist.findIndex(song => {
           return song.id === item.id;
         });
       }
@@ -178,8 +181,8 @@ export default {
       this.setCurrentIndex(index);
     },
     scrollToCurrent(song){
-      const index = this.sequenceList.findIndex((item) => {
-        return song.id === item.id
+      const index = this.$refs.listItem.findIndex((item)=> {
+        return song.id === parseInt(item.id)
       })
       this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
     },

@@ -14,6 +14,7 @@
   </div>
 </template>
 <script>
+import Song from '@/common/js/song'
 export default {
   name: "songList",
   props: {
@@ -32,7 +33,8 @@ export default {
     },
     selectItem(item, index){
       //点击哪首歌曲，传出去
-      this.$emit('select', item, index)
+      const song = new Song(item)
+      this.$emit('select', song, index)
     },
     getRankCls(index){
       if(index <= 2){

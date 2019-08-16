@@ -219,7 +219,8 @@ export default {
     }),
     ...mapActions({
       saveFavoriteList: 'saveFavoriteList',
-      deleteFavoriteList: 'deleteFavoriteList'
+      deleteFavoriteList: 'deleteFavoriteList',
+      savePlayHistory: 'savePlayHistory'
     }),
     enter(el, done) {
       const { x, y, scale } = this._getPosAndScale();
@@ -486,7 +487,6 @@ export default {
           opacity = 1
         }
       } else{
-        console.log(this.touch.percent)
         if(this.touch.percent < 0.9){
           offsetWidth = 0
           this.currentShow = 'cd'
@@ -554,7 +554,7 @@ export default {
       }
 
       this.$nextTick(() => {
-        this.$refs.audio.play();
+        this.$refs.audio.play()
         this.setPlayingState(true)
         this.getLyric()
       });
@@ -564,6 +564,12 @@ export default {
         const audio = this.$refs.audio;
         newPlaying ? audio.play() : audio.pause();
       });
+    },
+    currentIndex(newIndex, oldIndex){
+      if(newIndex === oldIndex || newIndex === -1){
+        return
+      }
+      this.savePlayHistory(this.playlist[newIndex])
     }
   }
 };

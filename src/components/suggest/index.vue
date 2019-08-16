@@ -36,7 +36,7 @@ export default {
     NoResult
   },
   props: {
-    showSinger: {
+    showSinger: { //是否显示歌手
       type: Boolean,
       default: true
     },

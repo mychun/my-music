@@ -7,87 +7,233 @@
           <i class="icon-close" @click="hide"></i>
         </div>
       </div>
+      <div class="search-box-wrapper">
+        <search-box ref="searchBox" @query="onQueryChange" placeholder="搜索歌曲"></search-box>
+      </div>
+      <div class="shortcut" v-show="!query">
+        <switches :switches="switches" :currentIndex="currentIndex" @switch="switchItem"></switches>
+        <div class="list-wrapper">
+          <scroll ref="songList" v-show="currentIndex===0" class="list-scroll">
+            <div class="list-inner">
+              <song-list :songs="playHistory" @select="selectSong"></song-list>
+            </div>
+          </scroll>
+          <scroll ref="searchList" v-show="currentIndex===1" class="list-scroll">
+            <div class="list-inner">
+              <search-list
+                @delete="deleteSearchHistory"
+                @select="addQuery"
+                :searches="searchHistory"
+              ></search-list>
+            </div>
+          </scroll>
+        </div>
+      </div>
+      <div class="search-result" v-show="query">
+        <suggest
+          :query="query"
+          :showSinger="showSinger"
+          @select="selectSuggest"
+          @listScroll="blurInput"
+        ></suggest>
+      </div>
+      <top-tip ref="topTip">
+        <div class="tip-title">
+          <i class="icon-ok"></i>
+          <span class="text">1首歌曲已经添加到播放列表</span>
+        </div>
+      </top-tip>
     </div>
   </transition>
 </template>
 <script>
+import SearchBox from "@/base/search-box";
+import Suggest from "@/components/suggest";
+import TopTip from "@/base/top-tip";
+import Scroll from "@/base/scroll";
+import Switches from "@/base/switches";
+import SongList from "@/base/song-list";
+import { mapActions, mapGetters } from "vuex";
+import SearchList from "@/base/search-list";
+
 export default {
-    name: 'addSong',
-    props: {
-        
-    },
-    data(){
-        return {
-            showFlag: false
-        }
-    },
-    methods: {
-        show(){
-            this.showFlag = true
+  name: "addSong",
+  props: {},
+  components: {
+    SearchBox,
+    Suggest,
+    TopTip,
+    Scroll,
+    Switches,
+    SongList,
+    SearchList
+  },
+  data() {
+    return {
+      showFlag: false,
+      query: "",
+      showSinger: false,
+      switches: [
+        {
+          name: "最近播放"
         },
-        hide(){
-            this.showFlag = false
+        {
+          name: "搜索历史"
         }
-    }
-}
+      ],
+      currentIndex: 0
+    };
+  },
+  created() {
+    
+  },
+  computed: {
+    ...mapGetters(["playHistory", "searchHistory"])
+  },
+  methods: {
+    addQuery(query) {
+      this.$refs.searchBox.setQuery(query);
+    },
+    deleteSearchHistory(item) {
+      this.deleteSearchHistory(item);
+    },
+    show() {
+      this.showFlag = true;
+      this.refreshScroll()
+    },
+    refreshScroll(){
+        this.$nextTick(()=>{
+            if(this.currentIndex === 0){
+                this.$refs.songList.refresh()
+            }else if(this.currentIndex === 1){
+                this.$refs.searchList.refresh()
+            }
+        })
+    },
+    selectSong(song, index) {
+        this.insertSong(song)
+        this.$refs.topTip.show();
+    },
+    hide() {
+      this.showFlag = false;
+    },
+    switchItem(index) {
+      this.currentIndex = index;
+    },
+    onQueryChange(query) {
+      this.query = query;
+    },
+    selectSuggest() {
+      this.$refs.topTip.show();
+      this.saveSearch();
+    },
+    blurInput() {
+      //上拉滚动时，让输入框失去焦点，关闭手机键盘
+      this.$refs.searchBox.blur();
+    },
+    saveSearch() {
+      this.saveSearchHistory(this.query);
+    },
+    ...mapActions(["saveSearchHistory", "deleteSearchHistory", 'insertSong'])
+  },
+  watch: {
+      currentIndex(){
+          this.refreshScroll()
+      },
+      query(newQuery){
+          if(!newQuery){
+              this.refreshScroll()
+          }
+      }
+  }
+};
 </script>
 <style lang="stylus" scoped>
-.add-song
-    position: fixed
-    top: 0
-    bottom: 0
-    width: 100%
-    z-index: 200
-    background: $color-background
-    &.slide-enter-active, &.slide-leave-active
-      transition: all 0.3s
-    &.slide-enter, &.slide-leave-to
-      transform: translate3d(100%, 0, 0)
-    .header
-      position: relative
-      height: 44px
-      text-align: center
-      .title
-        line-height: 44px
-        font-size: $font-size-large
-        color: $color-text
-      .close
-        position: absolute
-        top: 0
-        right: 8px
-        .icon-close
-          display: block
-          padding: 12px
-          font-size: 20px
-          color: $color-theme
+.add-song {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 200;
+  background: $color-background;
 
-    .search-box-wrapper
-      margin: 20px
-    .shortcut
-      .list-wrapper
-        position: absolute
-        top: 165px
-        bottom: 0
-        width: 100%
-        .list-scroll
-          height: 100%
-          overflow: hidden
-          .list-inner
-            padding: 20px 30px
-    .search-result
-      position: fixed
-      top: 124px
-      bottom: 0
-      width: 100%
-    .tip-title
-      text-align: center
-      padding: 18px 0
-      font-size: 0
-      .icon-ok
-        font-size: $font-size-medium
-        color: $color-theme
-        margin-right: 4px
-      .text
-        font-size: $font-size-medium
-        color: $color-text
+  &.slide-enter-active, &.slide-leave-active {
+    transition: all 0.3s;
+  }
+
+  &.slide-enter, &.slide-leave-to {
+    transform: translate3d(100%, 0, 0);
+  }
+
+  .header {
+    position: relative;
+    height: 44px;
+    text-align: center;
+
+    .title {
+      line-height: 44px;
+      font-size: $font-size-large;
+      color: $color-text;
+    }
+
+    .close {
+      position: absolute;
+      top: 0;
+      right: 8px;
+
+      .icon-close {
+        display: block;
+        padding: 12px;
+        font-size: 20px;
+        color: $color-theme;
+      }
+    }
+  }
+
+  .search-box-wrapper {
+    margin: 20px;
+  }
+
+  .shortcut {
+    .list-wrapper {
+      position: absolute;
+      top: 165px;
+      bottom: 0;
+      width: 100%;
+
+      .list-scroll {
+        height: 100%;
+        overflow: hidden;
+
+        .list-inner {
+          padding: 20px 30px;
+        }
+      }
+    }
+  }
+
+  .search-result {
+    position: fixed;
+    top: 124px;
+    bottom: 0;
+    width: 100%;
+  }
+
+  .tip-title {
+    text-align: center;
+    padding: 18px 0;
+    font-size: 0;
+
+    .icon-ok {
+      font-size: $font-size-medium;
+      color: $color-theme;
+      margin-right: 4px;
+    }
+
+    .text {
+      font-size: $font-size-medium;
+      color: $color-text;
+    }
+  }
+}
 </style>

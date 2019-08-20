@@ -28,14 +28,3 @@ export function debounce(func, delay) {
       }, delay)
     }
   }
-
-  //预防不断重复触发函数
-// export function debounce() {
-//     console.log(1)
-//     return function(){
-//         console.log(2)
-//         return function(){
-//             console.log(3)
-//         }
-//     }
-//   }

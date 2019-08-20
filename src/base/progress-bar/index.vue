@@ -73,9 +73,6 @@ export default {
             
             this.$refs.progress.style.width = `${offsetWidth}px`
             this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px,0,0)`
-
-            // console.log(offsetWidth)
-            // console.log(this.$refs.progress.style.width)
         },
         _triggerPersent(){
             //计算percent，去触发父组件的播放进度

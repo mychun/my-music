@@ -311,12 +311,12 @@ export default {
         return
       }
 
-      if(this.mode === playMode.loop){
+      if(this.mode === playMode.loop || this.playlist.length === 1){
         //如果是单曲循环模式
         this.loop()
       }else{
         let index = this.currentIndex + 1
-        if(this.currentIndex === this.playlist.length){
+        if(this.currentIndex === this.playlist.length - 1){
           index = 0
         }
         //改变播放歌曲
@@ -334,12 +334,12 @@ export default {
       if(!this.songReady){
         return
       }
-      if(this.mode === playMode.loop){
+      if(this.mode === playMode.loop || this.playlist.length === 1){
         //如果是单曲循环模式
         this.loop()
       }else{
         let index = this.currentIndex - 1
-        if(this.currentIndex  === -1){
+        if(index  === -1){
           index = this.playlist.length - 1
         }
         //改变播放歌曲

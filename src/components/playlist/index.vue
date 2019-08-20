@@ -155,10 +155,10 @@ export default {
     },
     show() {
       this.showFlag = true;
-      setTimeout(() => {
+      this.$nextTick(()=>{
         this.$refs.listContent.refresh();
-        this.scrollToCurrent(this.currentSong, true)
-      }, 20);
+      })
+      this.scrollToCurrent(this.currentSong, true)
     },
     hide() {
       this.showFlag = false;
@@ -170,7 +170,6 @@ export default {
       return "";
     },
     selectItem(item,index) {
-      console.log(item)
       if (this.mode === playMode.random) {
           index = this.playlist.findIndex(song => {
           return song.id === item.id;
@@ -181,10 +180,14 @@ export default {
       this.setCurrentIndex(index);
     },
     scrollToCurrent(current) {
-        const index = this.sequenceList.findIndex((song) => {
-          return current.id === song.id
+        this.$nextTick(()=>{
+          const index = this.sequenceList.findIndex((song) => {
+            return current.id === song.id
+          })
+          this.$refs.listContent.scrollToElement(this.$refs.list.$el.children[index], 300)
+          //删除歌曲，这个滚动会出错
+          // this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
         })
-        this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
         
       },
     ...mapMutations({
@@ -205,9 +208,7 @@ export default {
       if(!this.showFlag || newSong === oldSong){
         return
       }
-      setTimeout(()=>{
-this.scrollToCurrent(newSong)
-      }, 20)
+      this.scrollToCurrent(newSong)
         
     }
   }

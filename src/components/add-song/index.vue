@@ -111,6 +111,7 @@ export default {
         })
     },
     selectSong(song, index) {
+      console.log(song)
         this.insertSong(song)
         this.$refs.topTip.show();
     },

@@ -7,6 +7,7 @@ import Rank from '@/components/rank'
 import Search from '@/components/search'
 import Disc from '@/components/disc'
 import TopList from '@/components/top-list'
+import UserCenter from '@/components/user-center'
 
 Vue.use(Router)
 
@@ -53,6 +54,10 @@ export default new Router({
           component: SingerDetail
         }
       ]
+    },
+    {
+      path: '/user',
+      component: UserCenter
     },
     {
       path: '/*', //当使用 /* 一定要放在最后，否则会报错

@@ -12,13 +12,12 @@
           </h1>
         </div>
         <scroll ref="listContent" class="list-content">
-          <transition-group name="list" tag="ul">
+          <transition-group name="list" ref="list" tag="ul">
             <li
               class="item"
               v-for="(item, index) in sequenceList"
               :key="item.id"
               @click="selectItem(item,index)"
-              :id="item.id"
               ref="listItem"
             >
               <i class="current" :class="getCurrentIcon(item)"></i>
@@ -50,7 +49,7 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from "vuex";
 import Scroll from "@/base/scroll";
-import { setTimeout } from "timers";
+import { setTimeout, clearTimeout } from "timers";
 import { playMode } from "@/common/js/config";
 import { shuffle } from "@/common/js/util";
 import Confirm from '@/base/confirm'
@@ -125,6 +124,7 @@ export default {
     },
     clearSongList(){
         this.deleteSongList()
+        this.hide()
     },
     deleteSong(item){
         this.deleteSong(item)
@@ -157,7 +157,7 @@ export default {
       this.showFlag = true;
       setTimeout(() => {
         this.$refs.listContent.refresh();
-        this.scrollToCurrent(this.currentSong)
+        this.scrollToCurrent(this.currentSong, true)
       }, 20);
     },
     hide() {
@@ -170,7 +170,7 @@ export default {
       return "";
     },
     selectItem(item,index) {
-
+      console.log(item)
       if (this.mode === playMode.random) {
           index = this.playlist.findIndex(song => {
           return song.id === item.id;
@@ -180,12 +180,13 @@ export default {
       this.setPlayingState(true)
       this.setCurrentIndex(index);
     },
-    scrollToCurrent(song){
-      const index = this.$refs.listItem.findIndex((item)=> {
-        return song.id === parseInt(item.id)
-      })
-      this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
-    },
+    scrollToCurrent(current) {
+        const index = this.sequenceList.findIndex((song) => {
+          return current.id === song.id
+        })
+        this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
+        
+      },
     ...mapMutations({
       setCurrentIndex: "SET_CURRENT_INDEX",
       setPlayList: "SET_PLAYLIST",
@@ -204,7 +205,10 @@ export default {
       if(!this.showFlag || newSong === oldSong){
         return
       }
-      this.scrollToCurrent(newSong)
+      setTimeout(()=>{
+this.scrollToCurrent(newSong)
+      }, 20)
+        
     }
   }
 };

@@ -83,7 +83,7 @@ export function getSongsUrl(songs) {
       if (--tryTime >= 0) {
         request()
       } else {
-        // alert('获取不到歌曲！')
+        alert('呜呜，获取不到歌曲！')
         reject(new Error('Can not get the songs url'))
       }
     }

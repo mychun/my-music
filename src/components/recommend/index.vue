@@ -133,7 +133,7 @@ export default {
         height: 65px;
         line-height: 65px;
         text-align: center;
-        font-size: $font-size-medium;
+        font-size: $font-size-medium-x;
         color: $color-theme;
       }
 
@@ -160,7 +160,7 @@ export default {
 
           .name {
             margin-bottom: 10px;
-            color: $color-text;
+            color: $color-text-ll;
           }
 
           .desc {

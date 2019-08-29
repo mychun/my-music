@@ -29,8 +29,11 @@ export default {
       flex: 1
       text-align: center
       .tab-link
-        padding-bottom: 5px
-        color: $color-text-l
+        color: $color-text-ll
+        display: block
+        height: 42px
+        width :100%
+        font-size :$font-size-medium-x
       &.router-link-active
         .tab-link
           color: $color-theme

@@ -1,7 +1,7 @@
 <template>
     <div class="m-header">
         <div class="icon"></div>
-        <h1 class="text">Chicken Music</h1>
+        <h1 class="text">Chunzi Music</h1>
         <router-link tag="div" to="/user" class="mine">
           <i class="icon-mine"></i>
         </router-link>
@@ -15,13 +15,11 @@ export default {
 }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
-
-
-
   .m-header
     position: relative
     height: 44px
-    text-align: center
+    text-align: left;
+    padding-left 10px;
     color: $color-theme
     font-size: 0
     .icon

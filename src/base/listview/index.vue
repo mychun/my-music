@@ -263,7 +263,7 @@ export default {
       height: 30px;
       line-height: 30px;
       padding-left: 20px;
-      font-size: $font-size-small;
+      font-size: $font-size-medium;
       color: $color-text-l;
       background: $color-highlight-background;
     }
@@ -281,7 +281,7 @@ export default {
 
       .name {
         margin-left: 20px;
-        color: $color-text-l;
+        color: $color-text-ll;
         font-size: $font-size-medium;
       }
     }
@@ -303,7 +303,7 @@ export default {
     .item {
       padding: 3px;
       line-height: 1;
-      color: $color-text-l;
+      color: $color-text-ll;
       font-size: $font-size-small;
 
       &.current {
@@ -322,7 +322,7 @@ export default {
       height: 30px;
       line-height: 30px;
       padding-left: 20px;
-      font-size: $font-size-small;
+      font-size: $font-size-medium;
       color: $color-text-l;
       background: $color-highlight-background;
     }

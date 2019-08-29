@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <button>提交</button>
+    <img src="">
+    <script>
+        $('button').click(function(){
+            $.ajax({
+                type: 'POST',
+                url: 'http://localhost:3000/cors',
+                data: {
+                    g_tk: 1928093487,
+                    inCharset: 'utf-8',
+                    outCharset: 'utf-8',
+                    notice: 0,
+                    format: 'json',
+                    platform: 'yqq',
+                    hostUin: 0,
+                    sin: 0,
+                    ein: 29,
+                    sortId: 5,
+                    needNewCode: 0,
+                    categoryId: 10000000,
+                    rnd: 0.9603405246980512
+                },
+                dataType: 'json',
+                success: function(data){
+                    console.log(data)
+                },
+                error: function (e) { console.log(e) }
+            })
+        })
+    </script>
+</body>
+</html>

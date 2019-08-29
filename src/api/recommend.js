@@ -22,6 +22,7 @@ export function getRecommend(){
 export function getDiscList(){
   //这里不是用jsonp请求
   //使用跨域的
+  // const url = debug ? '/api/getCdInfo' : 'http://ustbhuangyi.com/music/api/getDiscList'
   const url = '/api/getDiscList'
   const data = Object.assign({}, commonParams, {
     platform: 'yqq',

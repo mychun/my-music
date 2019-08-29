@@ -14,6 +14,10 @@ const TopList = () => import('@/components/top-list')
 const UserCenter = () => import('@/components/user-center')
 
 export default new Router({
+  mode: 'history',
+  //设置根目录
+  // base: process.env.BASE_URL, //开发环境目录
+  base: 'mymusic', //服务器项目根目录
   routes: [
     {
       path: '/',
